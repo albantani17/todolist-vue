@@ -1,18 +1,21 @@
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue'
+import type { ITask } from '@/types/Task';
+import { ref, watchEffect } from 'vue';
 
-const task = ref('')
-const errorMessage = ref('')
+const task = ref('');
+const errorMessage = ref('');
 
-const localStorage = window.localStorage
+const emit = defineEmits<{ (e: 'add', task: ITask): void }>();
+
+const localStorage = window.localStorage;
 
 const addTask = () => {
   if (!task.value.trim()) {
-    errorMessage.value = 'Task tidak boleh kosong'
-    return
+    errorMessage.value = 'Task tidak boleh kosong';
+    return;
   }
-  const tasksFromStorage = localStorage.getItem('task')
-  const existingTasks = tasksFromStorage ? JSON.parse(tasksFromStorage) : []
+  const tasksFromStorage = localStorage.getItem('task');
+  const existingTasks = tasksFromStorage ? JSON.parse(tasksFromStorage) : [];
 
   // 2. Buat objek task baru
   const newTask = {
@@ -20,16 +23,15 @@ const addTask = () => {
     createdAt: Date.now(),
     title: task.value,
     isDone: false,
-  }
-  const updatedTask = [...existingTasks, newTask]
-  localStorage.setItem('task', JSON.stringify(updatedTask))
-  task.value = ''
-  errorMessage.value = ''
-}
+  };
+  task.value = '';
+  errorMessage.value = '';
+  emit('add', newTask);
+};
 </script>
 
 <template>
-  <div class="w-full bg-white rounded-lg shadow-xl flex flex-col gap-2  p-4">
+  <div class="w-full bg-white rounded-lg shadow-xl flex flex-col gap-2 p-4">
     <div class="flex w-full gap-2">
       <input
         type="text"
